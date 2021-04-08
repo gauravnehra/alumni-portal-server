@@ -1,70 +1,106 @@
-// dependencies
+const Alumni = require('../models/alumniModel');
+const AuthToken = require('../models/authTokenModel');
+const authTokenHelper = require('../helpers/authTokenHelper');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 exports.register = async (req, res) => {
-    if (!req.body.name || !req.body.batch || !req.body.email || !req.body.password) {
-        return res.status(400).send({ message: "Bad Request" });
+    if (!req.body.name || !req.body.email || !req.body.password) {
+        return res.status(400).json({ message: "Bad Request" });
     }
 
+    var alumni = await Alumni.findOne({ email: req.body.email });
+    if (alumni) {
+        return res.status(409).json({ message: "Accound already exists with this email." });
+    }
 
-    // // check if account exists
-    // let company = await Company.findOne({ email: req.body.email })
-    // if (company) {
-    //     // 409 : Conflict
-    //     return res.status(409).send({ msg: "User already exists with same email id." })
-    // }
+    bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
+        if (err) console.log('error with bcrpt\n***\n' + err);
 
-    // // create new user(company), hash the password
-    // company = new Company({
-    //     name: req.body.name,
-    //     email: req.body.email,
-    //     password: bcrypt.hashSync(req.body.password, salt),
-    //     location: req.body.location,
-    //     domain: req.body.domain
-    // })
+        req.body.password = hash;
 
-    // // saving user in DB
-    // company.save(async (err) => {
-    //     if (err) res.status(500).send({ msg: "Some error occured", err: err })
-    //     else {
-    //         let token = new Token({ userId: company._id })
-    //         await token.save()
-    //         sendVerifyMail(company._id, company.email)
-    //         res.status(200).header("authorization", token._id).send({ msg: "Account created successfully." })
-    //     }
-    // })
+        Alumni.create(req.body, function (err, alumni) {
+            if (err) return res.status(500).json(err);
 
-    res.send('respond with a resource');
+            const newAuthToken = authTokenHelper.generateAuthToken(alumni.email);
 
+            AuthToken.create({ token: newAuthToken, userId: alumni._id, userType: 'alumni' }, function (err, token) {
+                if (err) return res.status(500).json(err);
+
+                res.cookie('authToken', newAuthToken);
+                alumni._id = undefined;
+                alumni.password = undefined;
+                alumni.authLevel = undefined;
+                alumni.emailVerified = undefined;
+                alumni.detailsVerified = undefined;
+                res.status(200).json(alumni);
+            })
+        })
+    });
 };
 
 exports.login = async (req, res) => {
-    // // check if account exists
-    // let company = await Company.findOne({ email: req.body.email })
-    // if (company) {
-    //     // 409 : Conflict
-    //     return res.status(409).send({ msg: "User already exists with same email id." })
-    // }
+    if (!req.body.email || !req.body.password) {
+        return res.status(400).json({ message: "Bad Request" });
+    }
 
-    // // create new user(company), hash the password
-    // company = new Company({
-    //     name: req.body.name,
-    //     email: req.body.email,
-    //     password: bcrypt.hashSync(req.body.password, salt),
-    //     location: req.body.location,
-    //     domain: req.body.domain
-    // })
+    var alumni = await Alumni.findOne({ email: req.body.email });
+    if (!alumni) {
+        return res.status(401).json({ message: "Email or password invalid." });
+    }
 
-    // // saving user in DB
-    // company.save(async (err) => {
-    //     if (err) res.status(500).send({ msg: "Some error occured", err: err })
-    //     else {
-    //         let token = new Token({ userId: company._id })
-    //         await token.save()
-    //         sendVerifyMail(company._id, company.email)
-    //         res.status(200).header("authorization", token._id).send({ msg: "Account created successfully." })
-    //     }
-    // })
+    bcrypt.compare(req.body.password, alumni.password, async function (err, result) {
+        if (result) {
+            var authToken = await AuthToken.findOne({ userId: alumni._id });
+            if (authToken) {
+                const newAuthToken = authTokenHelper.generateAuthToken(alumni.email);
 
-    res.send('respond with a resource');
+                authToken.token = newAuthToken;
+                await authToken.save();
 
+                res.cookie('authToken', newAuthToken);
+                res.status(200).json(alumni);
+            } else {
+                const newAuthToken = authTokenHelper.generateAuthToken(alumni.email);
+
+                AuthToken.create({ token: newAuthToken, userId: alumni._id, userType: 'alumni' }, function (err, token) {
+                    if (err) return res.status(500).json(err);
+
+                    res.cookie('authToken', newAuthToken);
+                    alumni._id = undefined;
+                    alumni.password = undefined;
+                    alumni.authLevel = undefined;
+                    alumni.emailVerified = undefined;
+                    alumni.detailsVerified = undefined;
+                    res.status(200).json(alumni);
+                })
+            }
+        } else {
+            res.status(401).json({ message: "Email or password invalid." });
+        }
+    })
+};
+
+exports.getProfile = async (req, res) => {
+    Alumni.findOne({ email: req.user.email }, 'name email graduatedIn gender mobile currentJob emailVerified detailsVerified', function (err, alumni) {
+        if (err) res.status(500).json(err);
+        else {
+            alumni._id = undefined;
+            res.status(200).json(alumni);
+        }
+    })
+};
+
+exports.editProfile = async (req, res) => {
+    Alumni.findOneAndUpdate({ email: req.user.email }, req.body, { new: true }, function (err, alumni) {
+        if (err) res.status(500).json(err);
+        else {
+            alumni._id = undefined;
+            alumni.password = undefined;
+            alumni.authLevel = undefined;
+            alumni.emailVerified = undefined;
+            alumni.detailsVerified = undefined;
+            res.status(200).json(alumni);
+        }
+    })
 };

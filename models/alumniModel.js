@@ -6,37 +6,59 @@ let alumniSchema = new Schema({
         type: String,
         required: true,
     },
-    email: {},
-    password: {},
-    batch: {},
-    rollNumber: {},
-    gender: {},
-    dob: {},
-    residenceCity: {
+
+    email: {
         type: String,
-        required: false,
+        trim: true,
+        lowercase: true,
+        unique: true,
+        required: true,
+        validate: {
+            validator: function (v) {
+                return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
+            },
+            message: "Please enter a valid email"
+        },
     },
-    mobile: {},
-    //social
+
+    password: {
+        type: String,
+        required: true,
+    },
+
+    graduatedIn: {
+        type: Number,
+        min: 1980,
+    },
+
+    gender: {
+        type: String,
+        enum: ['M', 'F', 'Other']
+    },
+
+    mobile: {
+        type: String, // with country code
+    },
+
     currentJob: {
         profile: {
             type: String,
-            required: true,
         },
         companyName: {
             type: String,
-            required: true,
         }
     },
-    // experiences
+
     authLevel: {
         type: Number,
-        required: true,
+        default: 4,
     },
+
     emailVerified: {
         type: Boolean,
         default: false
     },
+
     detailsVerified: {
         type: Boolean,
         default: false
