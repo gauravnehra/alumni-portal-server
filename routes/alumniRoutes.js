@@ -11,9 +11,9 @@ router.post('/login', alumniController.login);
 
 router.use(authenticate);
 
-router.get('/', authorize(4), alumniController.getProfile);
-router.patch('/', authorize(4), alumniController.editProfile);
+router.get('/', authorize([4, 6]), alumniController.getProfile);
+router.patch('/', authorize([4]), alumniController.editProfile);
 
-router.get('/profile/:email', authorize(3), alumniController.getPublicProfile);
+router.get('/profile/:email', alumniController.getPublicProfile);
 
 module.exports = router;

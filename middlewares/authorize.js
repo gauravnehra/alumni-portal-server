@@ -1,10 +1,10 @@
-module.exports = function (role) {
+module.exports = function (allowedRoles) {
     return (req, res, next) => {
-        if (role > req.user.authLevel) {
-            return res.status(403).json({ message: "Action not permitted for user." });
-        } else {
-            console.log('role: ' + role);
+        if (allowedRoles.indexOf(req.user.authLevel) != -1) {
+            console.log('role: ' + req.user.authLevel);
             next()
+        } else {
+            return res.status(403).json({ message: "Action not permitted for user." });
         }
     }
 };

@@ -10,7 +10,7 @@ router.post('/login', adminController.login);
 
 router.use(authenticate);
 
-router.get('/', authorize(6), adminController.getProfile);
-router.patch('/', authorize(6), adminController.editProfile);
+router.get('/', authorize([6]), adminController.getProfile);
+router.patch('/', authorize([6]), adminController.editProfile);
 
 module.exports = router;
