@@ -1,5 +1,7 @@
 const AuthToken = require('../models/authTokenModel');
 const Alumni = require('../models/alumniModel');
+const Faculty = require('../models/facultyModel');
+const Admin = require('../models/adminModel');
 const authTokenHelper = require('../helpers/authTokenHelper');
 
 module.exports = async function (req, res, next) {

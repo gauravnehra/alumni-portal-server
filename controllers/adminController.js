@@ -58,6 +58,10 @@ exports.login = async (req, res) => {
                 await authToken.save();
 
                 res.cookie('authToken', newAuthToken);
+                admin._id = undefined;
+                admin.password = undefined;
+                admin.authLevel = undefined;
+                admin.emailVerified = undefined;
                 res.status(200).json(admin);
             } else {
                 const newAuthToken = authTokenHelper.generateAuthToken(admin.email);

@@ -6,7 +6,7 @@ var router = express.Router();
 
 router.post('/register', facultyController.register);
 
-router.get('/login', facultyController.login);
+router.post('/login', facultyController.login);
 
 router.use(authenticate);
 

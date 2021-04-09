@@ -59,6 +59,11 @@ exports.login = async (req, res) => {
                 await authToken.save();
 
                 res.cookie('authToken', newAuthToken);
+                faculty._id = undefined;
+                faculty.password = undefined;
+                faculty.authLevel = undefined;
+                faculty.emailVerified = undefined;
+                faculty.detailsVerified = undefined;
                 res.status(200).json(faculty);
             } else {
                 const newAuthToken = authTokenHelper.generateAuthToken(faculty.email);
@@ -111,9 +116,11 @@ exports.getPublicProfile = async (req, res) => {
     }
     Faculty.findOne({ email: req.params.email }, 'name email department gender mobile', function (err, faculty) {
         if (err) res.status(500).json(err);
-        else {
+        else if (faculty) {
             faculty._id = undefined;
             res.status(200).json(faculty);
+        } else {
+            res.status(404).json({ message: 'Not Found' });
         }
     })
 };

@@ -59,6 +59,11 @@ exports.login = async (req, res) => {
                 await authToken.save();
 
                 res.cookie('authToken', newAuthToken);
+                alumni._id = undefined;
+                alumni.password = undefined;
+                alumni.authLevel = undefined;
+                alumni.emailVerified = undefined;
+                alumni.detailsVerified = undefined;
                 res.status(200).json(alumni);
             } else {
                 const newAuthToken = authTokenHelper.generateAuthToken(alumni.email);
@@ -111,9 +116,11 @@ exports.getPublicProfile = async (req, res) => {
     }
     Alumni.findOne({ email: req.params.email }, 'name email graduatedIn gender mobile currentJob', function (err, alumni) {
         if (err) res.status(500).json(err);
-        else {
+        else if (alumni) {
             alumni._id = undefined;
             res.status(200).json(alumni);
+        } else {
+            res.status(404).json({ message: 'Not Found' });
         }
     })
 };

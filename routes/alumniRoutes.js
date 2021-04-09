@@ -7,7 +7,7 @@ var router = express.Router();
 
 router.post('/register', alumniController.register);
 
-router.get('/login', alumniController.login);
+router.post('/login', alumniController.login);
 
 router.use(authenticate);
 
