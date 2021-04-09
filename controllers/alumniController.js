@@ -11,7 +11,7 @@ exports.register = async (req, res) => {
 
     var alumni = await Alumni.findOne({ email: req.body.email });
     if (alumni) {
-        return res.status(409).json({ message: "Accound already exists with this email." });
+        return res.status(409).json({ message: "Account already exists with this email." });
     }
 
     bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
@@ -100,6 +100,19 @@ exports.editProfile = async (req, res) => {
             alumni.authLevel = undefined;
             alumni.emailVerified = undefined;
             alumni.detailsVerified = undefined;
+            res.status(200).json(alumni);
+        }
+    })
+};
+
+exports.getPublicProfile = async (req, res) => {
+    if (!req.params.email) {
+        return res.status(400).json({ message: "Bad Request" });
+    }
+    Alumni.findOne({ email: req.params.email }, 'name email graduatedIn gender mobile currentJob', function (err, alumni) {
+        if (err) res.status(500).json(err);
+        else {
+            alumni._id = undefined;
             res.status(200).json(alumni);
         }
     })

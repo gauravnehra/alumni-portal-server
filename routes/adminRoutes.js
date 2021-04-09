@@ -1,9 +1,16 @@
 var express = require('express');
+const adminController = require('../controllers/adminController');
+const authenticate = require('../middlewares/authenticate');
+const authorize = require('../middlewares/authorize');
 var router = express.Router();
 
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-    res.send('respond with a resource');
-});
+router.post('/register', adminController.register);
+
+router.get('/login', adminController.login);
+
+router.use(authenticate);
+
+router.get('/', authorize(6), adminController.getProfile);
+router.patch('/', authorize(6), adminController.editProfile);
 
 module.exports = router;
