@@ -21,6 +21,10 @@ mongoose.connect(process.env.DB_URL, {
     process.exit();
 })
 
+mongoose.connection.on('connected', () => {
+    console.log('**********\nConnection with database established.\n**********');
+})
+
 mongoose.connection.on('error', err => {
     console.log('Connection with db lost.');
     console.log('\n**********\n' + error);
