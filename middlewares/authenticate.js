@@ -22,29 +22,32 @@ module.exports = async function (req, res, next) {
             return res.status(403).json({ message: "Invalid Token" });
         } else {
             if (tempAuthToken.userType === 'alumni') {
-                Alumni.findById(tempAuthToken.userId, 'email authLevel', function (err, alumni) {
+                Alumni.findById(tempAuthToken.userId, 'name email authLevel', function (err, alumni) {
                     if (err) {
                         return res.status(403).json({ message: "Invalid Token" });
                     } else {
                         req.user = alumni;
+                        req.userType = 'alumni';
                         next();
                     }
                 })
             } else if (tempAuthToken.userType === 'faculty') {
-                Faculty.findById(tempAuthToken.userId, 'email authLevel', function (err, faculty) {
+                Faculty.findById(tempAuthToken.userId, 'name email authLevel', function (err, faculty) {
                     if (err) {
                         return res.status(403).json({ message: "Invalid Token" });
                     } else {
                         req.user = faculty;
+                        req.userType = 'faculty';
                         next();
                     }
                 })
             } else if (tempAuthToken.userType === 'admin') {
-                Admin.findById(tempAuthToken.userId, 'email authLevel', function (err, admin) {
+                Admin.findById(tempAuthToken.userId, 'name email authLevel', function (err, admin) {
                     if (err) {
                         return res.status(403).json({ message: "Invalid Token" });
                     } else {
                         req.user = admin;
+                        req.userType = 'admin';
                         next();
                     }
                 })
