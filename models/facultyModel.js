@@ -41,7 +41,7 @@ let facultySchema = new Schema({
 
     authLevel: {
         type: Number,
-        default: 5,
+        default: 4,
     },
 
     emailVerified: {

@@ -51,7 +51,7 @@ let alumniSchema = new Schema({
 
     authLevel: {
         type: Number,
-        default: 4,
+        default: 3,
     },
 
     emailVerified: {

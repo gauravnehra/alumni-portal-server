@@ -10,8 +10,8 @@ router.post('/login', facultyController.login);
 
 router.use(authenticate);
 
-router.get('/', authorize([5, 6]), facultyController.getProfile);
-router.patch('/', authorize([5]), facultyController.editProfile);
+router.get('/', authorize([4, 6]), facultyController.getProfile);
+router.patch('/', authorize([4]), facultyController.editProfile);
 
 router.get('/profile/:email', facultyController.getPublicProfile);
 
