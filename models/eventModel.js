@@ -5,21 +5,45 @@ let eventSchema = new Schema({
     title: {
         type: String,
         required: true,
+        unique: true,
     },
 
     description: {
         type: String,
     },
 
-    venue: {
+    location: {
         type: String,
         required: true,
     },
 
-    dataOfEvent: {
+    from: {
+        type: Date,
+        required: true,
+    },
+
+    to: {
+        type: Date,
+        required: true,
+    },
+
+    createdBy: {
+        userId: {
+            type: mongoose.Types.ObjectId,
+            required: true,
+            refPath: 'createdBy.userType',
+        },
+        userType: {
+            type: String,
+            required: true,
+            enum: ['Admin', 'Faculty'],
+        }
+    },
+
+    createdOn: {
         type: Date,
         default: Date,
-    },
+    }
 })
 
 module.exports = mongoose.model("Event", eventSchema)
