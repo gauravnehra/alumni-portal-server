@@ -1,6 +1,7 @@
 const Event = require('../models/eventModel');
 
 exports.createEvent = async (req, res) => {
+    // Remove next two lines after test
     req.body.from = Date();
     req.body.to = Date();
     if (!req.body.title || !req.body.location || !req.body.from || !req.body.to) {
@@ -50,7 +51,7 @@ exports.updateEventDetails = async (req, res) => {
         return res.status(400).json({ message: "Bad Request" });
     }
 
-    Event.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true }, async function (err, event) {
+    Event.findByIdAndUpdate(req.params.id, req.body, { new: true }, async function (err, event) {
         if (err) return res.status(500).json(err);
         if (!event) return res.status(404).json({ message: "Event not found." });
 

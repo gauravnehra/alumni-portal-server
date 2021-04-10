@@ -4,6 +4,7 @@ const authenticate = require('../middlewares/authenticate');
 const authorize = require('../middlewares/authorize');
 var router = express.Router();
 
+
 router.get('/top-3', eventController.getTopThreeEvents);
 
 router.get('/all', eventController.getAllEvents);

@@ -11,10 +11,17 @@ let newsSchema = new Schema({
         type: String,
     },
 
-    // name
     publishedBy: {
-        type: String,
-        required: true,
+        userId: {
+            type: mongoose.Types.ObjectId,
+            required: true,
+            refPath: 'publishedBy.userType',
+        },
+        userType: {
+            type: String,
+            required: true,
+            enum: ['Admin', 'Faculty'],
+        }
     },
 
     publishedOn: {
